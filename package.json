@@ -9,13 +9,35 @@
     "e": "npm run build && electron .",
     "dist": "npm run build && electron-builder"
   },
+  "build": {
+    "productName": "mingty",
+    "asar": true,
+    "mac": {
+      "target": [
+        "default"
+      ],
+      "icon": "public/256x256.png"
+    },
+    "dmg": {
+      "title": "Electron",
+      "icon": "public/256x256.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/256x256.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "shortcutName": "mingty",
+      "artifactName": "mingty ${version}.${ext}",
+      "uninstallDisplayName": "mingty"
+    }
+  },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "cheerio": "^1.0.0-rc.12",
     "electron": "^22.0.0",
     "electron-builder": "^23.6.0",
-    "puppeteer": "^19.4.0",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
@@ -24,6 +46,8 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "sirv-cli": "^2.0.0"
+    "sirv-cli": "^2.0.0",
+    "puppeteer": "^19.4.0",
+    "cheerio": "^1.0.0-rc.12"
   }
 }

@@ -2,7 +2,7 @@
 	export let name;
 
 	const func = async () => {
-		const response = await window.versions.ping()
+		const response = await window.versions.naver_cafe_write()
 		console.log(response) // prints out 'pong'
 	}
 </script>
