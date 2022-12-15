@@ -3,10 +3,13 @@
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
-	let _log = `qwqwdqwd`;
+	let account_id = '';
+	let account_pw = '';
+	let accounts = [{no:'', id:'', pw: ''}];
+	let _data = { account: [...accounts] };
 
 	const n_cafe_write = async () => {
-		const response = await window.bridge.n_cafe_write(todos)
+		await window.bridge.n_cafe_write({todos, _data})
 	}
 
 	const [send, receive] = crossfade({
@@ -14,14 +17,7 @@
 			const style = getComputedStyle(node);
 			const transform = style.transform === 'none' ? '' : style.transform;
 
-			return {
-				duration: 600,
-				easing: quintOut,
-				css: t => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`
-			};
+			XPathEvaluator
 		}
 	});
 
@@ -49,12 +45,40 @@
 <main>
 	<div class='board'>
 		<h1><center>네이버 자동글쓰기</center></h1>
-		<input type="button" style="width: 100%;" value="실행" on:click={() => {
+		<input type="button" style="width: 100%; cursor: pointer;" value="실행" on:click={() => {
 			n_cafe_write();
 		}} />
-
-		<textarea bind:value={_log}></textarea>
-
+		<br><br>
+		<input type="text" placeholder="ID" bind:value={account_id} />
+		<input type="password" placeholder="PW"bind:value={account_pw} />
+		<input type="button" value="추가" style="cursor: pointer;" on:click={() => {
+			let object = {
+				no: accounts.length+1,
+				id: account_id,
+				pw: account_pw
+			}
+			accounts.push({...object});
+			account_id = '';
+			account_pw = '';
+		}}/>
+		<br><br>
+		<table style="border: 1px solid #ccc;">
+			<tbody>
+				<tr>
+					<td>NO</td>
+					<td>아이디</td>
+					<td>비밀번호</td>
+				</tr>
+				{#each accounts as row}
+					<tr>
+						<td>{row.no}</td>
+						<td>{row.id}</td>
+						<td>{row.pw}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+		<textarea bind:value={_data.log}></textarea>
 		<input
 			class="new-todo"
 			placeholder="네이버 카페 URL을 입력해주세요."
