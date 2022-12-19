@@ -5,8 +5,8 @@
 
 	let account_id = '';
 	let account_pw = '';
-	let accounts = [{no:'', id:'', pw: ''}];
-	let _data = { account: [...accounts] };
+	let accounts = [];
+	let _data = { };
 
 	const n_cafe_write = async () => {
 		await window.bridge.n_cafe_write({todos, _data})
@@ -16,28 +16,29 @@
 		fallback(node, params) {
 			const style = getComputedStyle(node);
 			const transform = style.transform === 'none' ? '' : style.transform;
-
-			XPathEvaluator
+			return {
+				duration: 600,
+				easing: quintOut,
+				css: t => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`
+			};
 		}
 	});
-
 	let todos = [
 		{ id: 1, done: false, description: 'http://mingty.com' },
 	];
-
 	let uid = todos.length + 1;
-
 	function add(input) {
 		const todo = {
 			id: uid++,
 			done: false,
 			description: input.value
 		};
-
 		todos = [todo, ...todos];
 		input.value = '';
 	}
-
 	function remove(todo) {
 		todos = todos.filter(t => t !== todo);
 	}
@@ -60,6 +61,7 @@
 			accounts.push({...object});
 			account_id = '';
 			account_pw = '';
+			console.log(accounts);
 		}}/>
 		<br><br>
 		<table style="border: 1px solid #ccc;">

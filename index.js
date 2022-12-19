@@ -20,10 +20,10 @@ let createWindow = async () => {
     //: ipcMain.handle('logger_send', async (event, param) => _log.fn_write(param))
     ipcMain.handle('n_cafe_write', async (event, param) => _naver.fn_cafe_write(param))
 
-    mainWindow.loadFile(path.join(__dirname, "public/index.html"));
-
     //TODO: 개발자 도구 미사용.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+
+    mainWindow.loadFile(path.join(__dirname, "public/index.html"));
 
     // 창이 닫히면 호출됩니다.
     mainWindow.on('closed', () => {
