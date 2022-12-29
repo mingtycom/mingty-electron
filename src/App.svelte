@@ -8,9 +8,10 @@
 	let account_pw = '';
 	let accounts = [];
 	let consoleDiv;
+	let option = { headless: false };// 디폴트가 headless 라서 브라우저가 보이지 않으므로 false 해야 브라우저가 보임.
 
-	const n_cafe_write = async () => {
-		await window.bridge.n_cafe_write({todos, accounts})
+	let n_cafe_write = async () => {
+		await window.bridge.n_cafe_write({option, todos, accounts})
 	}
 
 	const [send, receive] = crossfade({
@@ -49,6 +50,8 @@
 	}
 
 	import io from 'socket.io-client'
+    import Switch from './components/Switch.svelte';
+
 	const socket = io("http://localhost:18092")
 	socket.on('log', (data) => {
 		//messages = [...messages, data]
@@ -75,6 +78,7 @@
 <main>
 	<div class='board'>
 		<h1><center>네이버 자동글쓰기</center></h1>
+		<Switch bind:value={option.headless} label="웹페이지 열고 실행" fontSize={15} design="slider" /><br>
 		<input type="button" style="width: 100%; cursor: pointer;" value="실행" on:click={() => {
 			n_cafe_write();
 		}} />

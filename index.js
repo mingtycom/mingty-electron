@@ -3,7 +3,7 @@ const path = require("path");
 const { Server } = require("socket.io")
 const io = new Server({
     cors: {
-        origin: "http://localhost:3000"
+        origin: ["http://localhost:3000", "http://localhost:8080"] // "*"
     }
 })
 const _naver = require("./src/services/naver/cafeWrite.js");
@@ -14,7 +14,7 @@ let mainWindow = null;
 let createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 700,
+    height: 950,
     autoHideMenuBar: true,
     webPreferences: {
         preload: path.join(__dirname, 'preload.js'),

@@ -13,7 +13,7 @@ let _naver = {};
 
 _naver.fn_cafe_write = async (param) => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: param.option.headless,
         defaultViewport: null
         // 디폴트가 headless 라서 브라우저가 보이지 않으므로 false 해야 브라우저가 보임.
 
@@ -24,7 +24,6 @@ _naver.fn_cafe_write = async (param) => {
     //const page = await browser.newPage();
 
     const [ page ] = await browser.pages();
-    await page.goto('https://nid.naver.com/nidlogin.login');
     
     /*: 값 가져올 때
         const content = await page.content;
@@ -32,7 +31,9 @@ _naver.fn_cafe_write = async (param) => {
         const lists = $(".news");
         console.log(lists);
     */
+
     for(const list of param.accounts) {
+        await page.goto('https://nid.naver.com/nidlogin.login');
         await page.evaluate((id, pw) => {
             document.querySelector('#id').value = id;
             document.querySelector('#pw').value = pw;
@@ -47,7 +48,7 @@ _naver.fn_cafe_write = async (param) => {
         for(const row of param.todos) {
             if(row.done) {
                 await page.waitForTimeout(2000)
-                sendMessage(`Page Goto ... ${row.description}`);
+                sendMessage(`현재 로그인 계정: ${list.id} / Page Goto: ${row.description}`);
                 await page.goto(row.description);
             }
         }
