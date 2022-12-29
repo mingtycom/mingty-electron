@@ -2,10 +2,12 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+    import { onMount } from 'svelte';
 
 	let account_id = '';
 	let account_pw = '';
 	let accounts = [];
+	let consoleDiv;
 
 	const n_cafe_write = async () => {
 		await window.bridge.n_cafe_write({todos, accounts})
@@ -45,6 +47,30 @@
 	function remove(todo) {
 		todos = todos.filter(t => t !== todo);
 	}
+
+	import io from 'socket.io-client'
+	const socket = io("http://localhost:18092")
+	socket.on('log', (data) => {
+		//messages = [...messages, data]
+		consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >>`
+		consoleDiv.value += data
+		consoleDiv.value += "\n"
+	})
+
+	onMount(() => {
+		consoleDiv = document.getElementById("console")
+			const consoleToHtml = function() {
+				consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
+				Array.from(arguments).forEach(el => {
+					consoleDiv.value += " "
+					const insertValue = typeof el === "object" ? JSON.stringify(el) : el
+					consoleDiv.value += insertValue
+				})
+				consoleDiv.value += "\n"
+			}
+
+		window.console.log = consoleToHtml
+	})
 </script>
 <main>
 	<div class='board'>
@@ -68,11 +94,12 @@
 					pw: account_pw
 				}
 				accounts = [...accounts, {...object}];
+				console.log(`ID: ${account_id} / PW: ${account_pw} 입력.`);
 				account_id = '';
 				account_pw = '';
 		}}>
 			<input type="text" placeholder="ID" bind:value={account_id} />
-			<input type="password" placeholder="PW"bind:value={account_pw} />
+			<input type="password" placeholder="PW" bind:value={account_pw} />
 			<input type="submit" value="추가" style="width: 30%;" />
 		</form>
 		<br><br>
@@ -135,6 +162,7 @@
 				</label>
 			{/each}
 		</div>
+		<textarea id="console" readonly></textarea>
 	</div>
 </main>
 
@@ -142,6 +170,9 @@
 	.board textarea {
 		width: 100%;
 		margin: 2em 0 1em 0;
+		height: 300px;
+		font-size: 12px;
+		resize: none;
 	}
 	.board .new-todo {
 		font-size: 1.4em;

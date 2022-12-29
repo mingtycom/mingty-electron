@@ -2,6 +2,13 @@ const path = require("path");
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
+const io = require('socket.io-client')
+const socket = io("http://localhost:18092")
+
+function sendMessage(data) {
+    socket.emit('log', data)
+}
+
 let _naver = {};
 
 _naver.fn_cafe_write = async (param) => {
@@ -39,8 +46,8 @@ _naver.fn_cafe_write = async (param) => {
 
         for(const row of param.todos) {
             if(row.done) {
-                console.log(`>> Page Goto ... ${row.description}`);
                 await page.waitForTimeout(2000)
+                sendMessage(`Page Goto ... ${row.description}`);
                 await page.goto(row.description);
             }
         }
