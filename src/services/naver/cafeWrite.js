@@ -25,24 +25,27 @@ _naver.fn_cafe_write = async (param) => {
         const lists = $(".news");
         console.log(lists);
     */
-    await page.evaluate((id, pw) => {
-        document.querySelector('#id').value = id;
-        document.querySelector('#pw').value = pw;
-    }, param._data.id, param._data.pw);
+    for(const list of param.accounts) {
+        await page.evaluate((id, pw) => {
+            document.querySelector('#id').value = id;
+            document.querySelector('#pw').value = pw;
+        }, list.id, list.pw);
 
-    await page.waitForTimeout(2000)
-    await page.click('[type=submit]');
+        await page.waitForTimeout(2000)
+        await page.click('[type=submit]');
 
-    await page.waitForTimeout(2000)
-    await page.click('[data-clk="svc.cafe"]');
+        await page.waitForTimeout(2000)
+        await page.click('[data-clk="svc.cafe"]');
 
-    for(const row of param.todos) {
-        if(row.done) {
-            console.log(`>> Page Goto ... ${row.description}`);
-            await page.waitForTimeout(2000)
-            await page.goto(row.description);
+        for(const row of param.todos) {
+            if(row.done) {
+                console.log(`>> Page Goto ... ${row.description}`);
+                await page.waitForTimeout(2000)
+                await page.goto(row.description);
+            }
         }
     }
+
     await browser.close();              // 브라우저 종료
 }
 

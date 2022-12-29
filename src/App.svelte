@@ -6,10 +6,9 @@
 	let account_id = '';
 	let account_pw = '';
 	let accounts = [];
-	let _data = { };
 
 	const n_cafe_write = async () => {
-		await window.bridge.n_cafe_write({todos, _data})
+		await window.bridge.n_cafe_write({todos, accounts})
 	}
 
 	const [send, receive] = crossfade({
@@ -26,10 +25,13 @@
 			};
 		}
 	});
+
 	let todos = [
-		{ id: 1, done: false, description: 'http://mingty.com' },
+		{ id: 1, done: false, description: 'https://cafe.naver.com/hacosa' },
 	];
+
 	let uid = todos.length + 1;
+
 	function add(input) {
 		const todo = {
 			id: uid++,
@@ -39,6 +41,7 @@
 		todos = [todo, ...todos];
 		input.value = '';
 	}
+	
 	function remove(todo) {
 		todos = todos.filter(t => t !== todo);
 	}
@@ -50,37 +53,53 @@
 			n_cafe_write();
 		}} />
 		<br><br>
-		<input type="text" placeholder="ID" bind:value={account_id} />
-		<input type="password" placeholder="PW"bind:value={account_pw} />
-		<input type="button" value="추가" style="cursor: pointer;" on:click={() => {
-			let object = {
-				no: accounts.length+1,
-				id: account_id,
-				pw: account_pw
+		<form on:submit|preventDefault={() => {
+			if(account_id == undefined || account_id == '') {
+				alert('ID를 입력하지 않았습니다.');
+				return false;
 			}
-			accounts.push({...object});
-			account_id = '';
-			account_pw = '';
-			console.log(accounts);
-		}}/>
+			if(account_pw == undefined || account_pw == '') {
+				alert('PW를 입력하지 않았습니다.');
+				return false;
+			}
+
+			let object = {
+					id: account_id,
+					pw: account_pw
+				}
+				accounts = [...accounts, {...object}];
+				account_id = '';
+				account_pw = '';
+		}}>
+			<input type="text" placeholder="ID" bind:value={account_id} />
+			<input type="password" placeholder="PW"bind:value={account_pw} />
+			<input type="submit" value="추가" style="width: 30%;" />
+		</form>
 		<br><br>
-		<table style="border: 1px solid #ccc;">
-			<tbody>
+		<table style="border: 1px solid #ccc; width: 100%;">
+			<thead>
 				<tr>
-					<td>NO</td>
-					<td>아이디</td>
-					<td>비밀번호</td>
+					<th>NO</th>
+					<th>아이디</th>
+					<th>비밀번호</th>
+					<th></th>
 				</tr>
-				{#each accounts as row}
+			</thead>
+			<tbody style="text-align: center;">
+				{#each accounts as row, index}
 					<tr>
-						<td>{row.no}</td>
+						<td>{(index+1)}</td>
 						<td>{row.id}</td>
-						<td>{row.pw}</td>
+						<td><input type="password" readonly disabled style="border: 0px;" value={row.pw}/></td>
+						<td>
+							<input type="button" style="cursor: pointer; width: 35px;" on:click="{() => {
+								accounts = accounts.filter(t => t !== row);
+							}}" value="X">
+						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
-		<textarea bind:value={_data.log}></textarea>
 		<input
 			class="new-todo"
 			placeholder="네이버 카페 URL을 입력해주세요."

@@ -6,7 +6,7 @@ let mainWindow = null;
 let createWindow = async () => {
     mainWindow = new BrowserWindow({
       width: 800,
-      height: 600,
+      height: 700,
       autoHideMenuBar: true,
       webPreferences: {
           preload: path.join(__dirname, 'preload.js'),
@@ -21,7 +21,7 @@ let createWindow = async () => {
     ipcMain.handle('n_cafe_write', async (event, param) => _naver.fn_cafe_write(param))
 
     //TODO: 개발자 도구 미사용.
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     mainWindow.loadFile(path.join(__dirname, "public/index.html"));
 
