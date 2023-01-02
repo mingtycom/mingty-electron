@@ -41,6 +41,7 @@ _naver.fn_cafe_write = async (param) => {
 
         await page.waitForTimeout(2000)
         await page.click('[type=submit]');
+        sendMessage(`계정 ID: ${list.id} 로그인 완료.`);
 
         await page.waitForTimeout(2000)
         await page.click('[data-clk="svc.cafe"]');

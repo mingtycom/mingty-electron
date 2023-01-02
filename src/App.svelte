@@ -55,7 +55,7 @@
 	const socket = io("http://localhost:18092")
 	socket.on('log', (data) => {
 		//messages = [...messages, data]
-		consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >>`
+		consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
 		consoleDiv.value += data
 		consoleDiv.value += "\n"
 	})
