@@ -7,6 +7,7 @@ const io = new Server({
     }
 })
 const _naver = require("./src/services/naver/cafeWrite.js");
+const _scraping = require("./src/services/common/scraping.js");
 
 process.env.SOCKET_PORT = 18092;
 
@@ -14,7 +15,7 @@ let mainWindow = null;
 let createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 950,
+    height: 1000,
     autoHideMenuBar: true,
     webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
@@ -27,6 +28,7 @@ let createWindow = async () => {
 
   //: ipcMain.handle('logger_send', async (event, param) => _log.fn_write(param))
   ipcMain.handle('n_cafe_write', async (event, param) => _naver.fn_cafe_write(param))
+  ipcMain.handle('c_scraping', async (event, param) => _scraping.exec(param))
 
   //TODO: 개발자 도구 미사용.
   //mainWindow.webContents.openDevTools();

@@ -1,0 +1,240 @@
+<script>
+	import { quintOut } from 'svelte/easing';
+	import { crossfade } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
+    import { onMount } from 'svelte';
+
+	let account_id = '';
+	let account_pw = '';
+	let accounts = [];
+	let consoleDiv;
+	let option = { headless: false };// 디폴트가 headless 라서 브라우저가 보이지 않으므로 false 해야 브라우저가 보임.
+
+	let n_cafe_write = async () => {
+		await window.bridge.n_cafe_write({option, todos, accounts})
+	}
+
+	const [send, receive] = crossfade({
+		fallback(node, params) {
+			const style = getComputedStyle(node);
+			const transform = style.transform === 'none' ? '' : style.transform;
+			return {
+				duration: 600,
+				easing: quintOut,
+				css: t => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`
+			};
+		}
+	});
+
+	let todos = [
+		{ id: 1, done: false, description: 'https://cafe.naver.com/hacosa' },
+	];
+
+	let uid = todos.length + 1;
+
+	function add(input) {
+		const todo = {
+			id: uid++,
+			done: false,
+			description: input.value
+		};
+		todos = [todo, ...todos];
+		input.value = '';
+	}
+	
+	function remove(todo) {
+		todos = todos.filter(t => t !== todo);
+	}
+
+	import io from 'socket.io-client'
+    import Switch from './components/Switch.svelte';
+
+	const socket = io("http://localhost:18092")
+	socket.on('log', (data) => {
+		//messages = [...messages, data]
+		consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
+		consoleDiv.value += data
+		consoleDiv.value += "\n"
+	})
+
+	onMount(() => {
+		consoleDiv = document.getElementById("console")
+			const consoleToHtml = function() {
+				consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
+				Array.from(arguments).forEach(el => {
+					consoleDiv.value += " "
+					const insertValue = typeof el === "object" ? JSON.stringify(el) : el
+					consoleDiv.value += insertValue
+				})
+				consoleDiv.value += "\n"
+			}
+
+		window.console.log = consoleToHtml
+	})
+</script>
+<main>
+	<div class='board'>
+		<h1><center>네이버 자동글쓰기</center></h1>
+		<Switch bind:value={option.headless} label="웹페이지 열고 실행" fontSize={15} design="slider" /><br>
+		<input type="button" style="width: 100%; cursor: pointer;" value="실행" on:click={() => {
+			n_cafe_write();
+		}} />
+		<br><br>
+		<form on:submit|preventDefault={() => {
+			if(account_id == undefined || account_id == '') {
+				alert('ID를 입력하지 않았습니다.');
+				return false;
+			}
+			if(account_pw == undefined || account_pw == '') {
+				alert('PW를 입력하지 않았습니다.');
+				return false;
+			}
+
+			let object = {
+					id: account_id,
+					pw: account_pw
+				}
+				accounts = [...accounts, {...object}];
+				console.log(`ID: ${account_id} / PW: ${account_pw} 입력.`);
+				account_id = '';
+				account_pw = '';
+		}}>
+			<input type="text" placeholder="ID" bind:value={account_id} />
+			<input type="password" placeholder="PW" bind:value={account_pw} />
+			<input type="submit" value="추가" style="width: 30%;" />
+		</form>
+		<br><br>
+		<table style="border: 1px solid #ccc; width: 100%;">
+			<thead>
+				<tr>
+					<th>NO</th>
+					<th>아이디</th>
+					<th>비밀번호</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;">
+				{#each accounts as row, index}
+					<tr>
+						<td>{(index+1)}</td>
+						<td>{row.id}</td>
+						<td><input type="password" readonly disabled style="border: 0px;" value={row.pw}/></td>
+						<td>
+							<input type="button" style="cursor: pointer; width: 35px;" on:click="{() => {
+								accounts = accounts.filter(t => t !== row);
+							}}" value="X">
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+		<input
+			class="new-todo"
+			placeholder="네이버 카페 URL을 입력해주세요."
+			on:keydown="{event => event.key === 'Enter' && add(event.target)}"
+		>
+
+		<div class='left'>
+			<h2>대기 리스트</h2>
+			{#each todos.filter(t => !t.done) as todo (todo.id)}
+				<label
+					in:receive="{{key: todo.id}}"
+					out:send="{{key: todo.id}}"
+					animate:flip
+				>
+					<input type=checkbox bind:checked={todo.done}>
+					{todo.description}
+					<button on:click="{() => remove(todo)}">x</button>
+				</label>
+			{/each}
+		</div>
+
+		<div class='right'>
+			<h2>실행 리스트</h2>
+			{#each todos.filter(t => t.done) as todo (todo.id)}
+				<label
+					in:receive="{{key: todo.id}}"
+					out:send="{{key: todo.id}}"
+					animate:flip
+				>
+					<input type=checkbox bind:checked={todo.done}>
+					{todo.description}
+					<button on:click="{() => remove(todo)}">x</button>
+				</label>
+			{/each}
+		</div>
+		<textarea id="console" readonly></textarea>
+	</div>
+</main>
+
+<style>
+	.board textarea {
+		width: 100%;
+		margin: 2em 0 1em 0;
+		height: 300px;
+		font-size: 12px;
+		resize: none;
+	}
+	.board .new-todo {
+		font-size: 1.4em;
+		width: 100%;
+		margin: 2em 0 1em 0;
+	}
+
+	.board {
+		max-width: 36em;
+		margin: 0 auto;
+	}
+
+	.board .left, .right {
+		float: left;
+		width: 50%;
+		padding: 0 1em 0 0;
+		box-sizing: border-box;
+	}
+
+	.board h2 {
+		font-size: 2em;
+		font-weight: 200;
+		user-select: none;
+	}
+
+	.board label {
+		top: 0;
+		left: 0;
+		display: block;
+		font-size: 1em;
+		line-height: 1;
+		padding: 0.5em;
+		margin: 0 auto 0.5em auto;
+		border-radius: 2px;
+		background-color: #eee;
+		user-select: none;
+	}
+
+	.board input { margin: 0 }
+
+	.board .right label {
+		background-color: rgb(180,240,100);
+	}
+
+	.board button {
+		float: right;
+		height: 1em;
+		box-sizing: border-box;
+		padding: 0 0.5em;
+		line-height: 1;
+		background-color: transparent;
+		border: none;
+		color: rgb(170,30,30);
+		opacity: 0;
+		transition: opacity 0.2s;
+	}
+
+	.board label:hover button {
+		opacity: 1;
+	}
+</style>
