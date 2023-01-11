@@ -31,6 +31,9 @@
 </main>
 
 <style>
+	main {
+		font-family: monospace;
+	}
 	.board {
 		max-width: 36em;
 		margin: 0 auto;

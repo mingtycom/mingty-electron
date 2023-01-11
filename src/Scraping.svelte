@@ -7,9 +7,28 @@
 	let consoleDiv;
 	let option = { headless: false };// 디폴트가 headless 라서 브라우저가 보이지 않으므로 false 해야 브라우저가 보임.
 	let _data = {type:'', value: ''};
-
+	let result;
+	
+	let fn_ln;
 	let scraping = async () => {
-		await window.bridge.c_scraping({option, todos})
+		let res = await window.bridge.c_scraping({option, todos, result});
+		let buffer = toArrayBuffer(res);
+		const a = document.createElement('a')
+		a.href = URL.createObjectURL(new Blob(
+			[ buffer ],
+			{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+		))
+		//a.download = `${Utils.now()}_excel.xlsx`;
+		a.click()
+	}
+
+	function toArrayBuffer(buf) {
+		const ab = new ArrayBuffer(buf.length);
+		const view = new Uint8Array(ab);
+		for (let i = 0; i < buf.length; ++i) {
+			view[i] = buf[i];
+		}
+		return ab;
 	}
 
 	const [send, receive] = crossfade({
@@ -26,6 +45,7 @@
 			};
 		}
 	});
+
 	let todosTypes = [
 		{ id: 1, text: 'URL', value: 'URL'},
 		{ id: 2, text: '페이지 파리미터명', value: 'PAGENM'},
@@ -37,9 +57,11 @@
 	let todos = [
 		{ id: 1, done: true, type:'URL', description: 'https://www.onsotong.go.kr/front/epilogue/epilogueBbsListPage.do' },
 		{ id: 2, done: true, type:'PAGENM', description: 'miv_pageNo' },
-		{ id: 3, done: true, type:'PAGESIZE', description: '54' },
+		{ id: 3, done: true, type:'PAGESIZE', description: '54' }, //54
 		{ id: 4, done: true, type:'CONTENT', description: 'li.survey_box' },
-		{ id: 5, done: true, type:'COLLECT', description: 'div.h3_tit h3' }
+		{ id: 5, done: true, type:'COLLECT', description: 'div.h3_tit h3' },
+		{ id: 6, done: true, type:'COLLECT', description: '#content_quick > div.survey_view_wrap > ul:nth-child(4) > li:nth-child(1) > a > span' },
+		{ id: 7, done: true, type:'COLLECT', description: '#content_quick > div.survey_view_wrap > ul:nth-child(4) > li:nth-child(2) > a' },
 	];
 
 	let uid = todos.length + 1;
@@ -76,20 +98,26 @@
 		consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
 		consoleDiv.value += data
 		consoleDiv.value += "\n"
+		fn_ln();
 	})
 
-	onMount(() => {
+	onMount(async () => {
 		consoleDiv = document.getElementById("console")
-			const consoleToHtml = function() {
-				consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
-				Array.from(arguments).forEach(el => {
-					consoleDiv.value += " "
-					const insertValue = typeof el === "object" ? JSON.stringify(el) : el
-					consoleDiv.value += insertValue
-				})
-				consoleDiv.value += "\n"
-			}
 
+		fn_ln = () => {
+			document.getElementById("console").scrollTop = document.getElementById("console").scrollHeight;
+		}
+
+		const consoleToHtml = function() {
+			consoleDiv.value += `${(new Date()).toLocaleString("ko-KR")} >> `
+			Array.from(arguments).forEach(el => {
+				consoleDiv.value += " "
+				const insertValue = typeof el === "object" ? JSON.stringify(el) : el
+				consoleDiv.value += insertValue
+			})
+			consoleDiv.value += "\n"
+			fn_ln();
+		}
 		window.console.log = consoleToHtml
 	})
 </script>
@@ -208,7 +236,7 @@
 	.board input { margin: 0 }
 
 	.board .right label {
-		background-color: rgb(180,240,100);
+		background-color: lavender;
 	}
 
 	.board button {
