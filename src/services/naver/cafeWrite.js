@@ -14,7 +14,7 @@ let _naver = {};
 _naver.fn_cafe_write = async (param) => {
     const browser = await puppeteer.launch({
         headless: param.option.headless,
-        defaultViewport: null
+        defaultViewport: null,
         // 디폴트가 headless 라서 브라우저가 보이지 않으므로 false 해야 브라우저가 보임.
 
         //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',  

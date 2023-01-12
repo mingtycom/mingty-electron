@@ -26,7 +26,6 @@ let createWindow = async () => {
     icon: path.join(__dirname, 'public/60x60.png') //: 아이콘 변경
   });
 
-  //: ipcMain.handle('logger_send', async (event, param) => _log.fn_write(param))
   ipcMain.handle('n_cafe_write', async (event, param) => _naver.fn_cafe_write(param))
   ipcMain.handle('c_scraping', async (event, param) => _scraping.exec(param))
 
@@ -54,7 +53,7 @@ let createWindow = async () => {
             io.emit('log', msg);
         });
     });
-    io.listen(18092);
+    io.listen(process.env.SOCKET_PORT);
   });
 
   // 모든 창이 닫히면 애플리케이션 종료.

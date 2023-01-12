@@ -13,9 +13,11 @@
 			<Scraping />
 		{:else}
 					<h1><center>목록</center></h1>
+					<!--
 					<input type="button" style="width: 100%; cursor: pointer;" value="네이버 자동글쓰기(사용불가, 미완)" on:click={() => {
 						type = 'AUTOWRITE';
 					}} /><br><br>
+					-->
 					<input type="button" style="width: 100%; cursor: pointer;" value="스크랩핑" on:click={() => {
 						type = 'SCRAPING';
 					}} />

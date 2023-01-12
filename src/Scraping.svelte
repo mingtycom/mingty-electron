@@ -62,6 +62,7 @@
 		{ id: 5, done: true, type:'COLLECT', description: 'div.h3_tit h3' },
 		{ id: 6, done: true, type:'COLLECT', description: '#content_quick > div.survey_view_wrap > ul:nth-child(4) > li:nth-child(1) > a > span' },
 		{ id: 7, done: true, type:'COLLECT', description: '#content_quick > div.survey_view_wrap > ul:nth-child(4) > li:nth-child(2) > a' },
+		{ id: 8, done: true, type:'COLLECT', description: '.text_wrap' },
 	];
 
 	let uid = todos.length + 1;

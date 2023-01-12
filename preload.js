@@ -6,7 +6,6 @@ contextBridge.exposeInMainWorld('bridge', {
     electron: () => process.versions.electron,
     n_cafe_write: (param) => ipcRenderer.invoke('n_cafe_write', param),
     c_scraping: (param) => ipcRenderer.invoke('c_scraping', param),
-    // we can also expose variables, not just functions
 })
 
 /*
