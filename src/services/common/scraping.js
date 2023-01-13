@@ -10,11 +10,9 @@ function sendMessage(data) {
 }
 
 let _scraping = {};
-
 _scraping.exec = async (param) => {
     sendMessage(`[[시작]]`);
-    sendMessage(`[[브라우저 옵션]] ${puppeteer.executablePath()}`);
-
+    sendMessage(`[[로딩중]]`);
     const browserFetcher = puppeteer.createBrowserFetcher();
     const revisionInfo = await browserFetcher.download('1069273');
 
@@ -73,7 +71,7 @@ _scraping.exec = async (param) => {
             await page.waitForTimeout(2000)
 
             let contents = {};
-            await page.click(`${object['CONTENT']}:nth-child(${j})`);
+            await page.click(`${object['CONTENT']}:nth-child(${j}) a`);
             sendMessage(`[[컨텐츠 진입]] PAGE: ${i}, CONTENTS: ${j}`);
             
             //: 수집 데이터

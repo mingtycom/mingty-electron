@@ -11,6 +11,29 @@
 	
 	let fn_ln;
 	let scraping = async () => {
+		let typeArr = [];
+		for(var key of todos) {
+			if(key.done) {
+				typeArr = [key.type, ...typeArr];
+			}
+		}
+		if(!typeArr.includes('URL')) {
+			alert('URL 값이 없습니다.');
+			return false;
+		}
+		if(!typeArr.includes('PAGENM')) {
+			alert('PAGENM 값이 없습니다.');
+			return false;
+		}
+		if(!typeArr.includes('PAGESIZE')) {
+			alert('PAGESIZE 값이 없습니다.');
+			return false;
+		}
+		if(!typeArr.includes('CONTENT')) {
+			alert('CONTENT값이 없습니다.');
+			return false;
+		}
+
 		let res = await window.bridge.c_scraping({option, todos, result});
 		let buffer = toArrayBuffer(res);
 		const a = document.createElement('a')
@@ -18,7 +41,6 @@
 			[ buffer ],
 			{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
 		))
-		//a.download = `${Utils.now()}_excel.xlsx`;
 		a.click()
 	}
 

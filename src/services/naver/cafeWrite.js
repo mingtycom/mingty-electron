@@ -10,7 +10,6 @@ function sendMessage(data) {
 }
 
 let _naver = {};
-
 _naver.fn_cafe_write = async (param) => {
     const browser = await puppeteer.launch({
         headless: param.option.headless,
